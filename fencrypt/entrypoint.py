@@ -1,62 +1,47 @@
 """ Entrypoint for f-encrypt commands """
-import os
-import sys
-from getpass import getpass
-from pathlib import Path
-
 import click
 
 import fencrypt.aes as aes
+import fencrypt.lib as lib
 
 
-KEY_PROMPT = "Enter Key: "
-
-
-def is_replace_mode():
-    """ Check if "F_ENCRYPT_REPLACE" is "true" - if it is, replace the file instead of printing """
-    env_var = "F_ENCRYPT_REPLACE"
-    return env_var in os.environ and os.environ[env_var].lower() == "true"
-
-
-def assert_path_exists(path):
-    """ Ensure that a given path exists """
-    if not Path(path).exists():
-        sys.stderr.write(f"ERROR - file not found: {path}\n")
-        sys.exit(1)
-    if not Path(path).is_file():
-        sys.stderr.write(f"ERROR - {path} must be a file\n")
-        sys.exit(1)
-
-
+@click.option("--keep/--rm", default=True, help="--rm to delete src file (F_ENCRYPT_RM overrides)")
+@click.option("--output", "-o", default=None, help="Output path - default = <PATH>.ct")
 @click.option("--key", "-k", envvar="F_ENCRYPT_KEY", default=None, help="Secret Key")
 @click.argument("path")
 @click.command()
-def encrypt(path, key):
+def encrypt(path, key, output, keep):
     """ Encrypt the given file """
-    assert_path_exists(path)
-    key = key if key else getpass(prompt=KEY_PROMPT)
-    with open(path, "r") as fil:
+    lib.echo(f"Encrypting - source file: {path}", 2)
+    lib.validate_path(path, encrypt=True)
+    output = lib.get_output(path, output)
+    key = lib.get_key(key)
+    with open(path, "rb") as fil:
+        lib.echo(f"Reading {path}", 2)
         plaintext = fil.read()
     ciphertext = aes.encrypt(key, plaintext)
-    if is_replace_mode():
-        with open(path, "w") as fil:
-            fil.write(ciphertext)
-    else:
-        print(ciphertext)
+    with open(output, "w") as fil:
+        lib.echo(f"Writing {output}", 2)
+        fil.write(ciphertext)
+    lib.delete_file(path, keep)
 
 
+@click.option("--keep/--rm", default=True, help="--rm to delete src file (F_ENCRYPT_RM overrides)")
+@click.option("--output", "-o", default=None, help="Output path - default = <PATH> (without .ct)")
 @click.option("--key", "-k", envvar="F_ENCRYPT_KEY", default=None, help="Secret Key")
 @click.argument("path")
 @click.command()
-def decrypt(path, key):
+def decrypt(path, key, output, keep):
     """ Dycrypt a given file """
-    assert_path_exists(path)
-    key = key if key else getpass(prompt=KEY_PROMPT)
+    lib.echo(f"Decrypting - source file: {path}", 2)
+    lib.validate_path(path, encrypt=False)
+    output = lib.get_output(path, output)
+    key = lib.get_key(key)
     with open(path, "r") as fil:
+        lib.echo(f"Reading {path}", 2)
         ciphertext = fil.read()
     plaintext = aes.decrypt(key, ciphertext)
-    if is_replace_mode():
-        with open(path, "w") as fil:
-            fil.write(plaintext)
-    else:
-        print(plaintext)
+    with open(output, "wb") as fil:
+        lib.echo(f"Writing {output}", 2)
+        fil.write(plaintext)
+    lib.delete_file(path, keep)
