@@ -51,6 +51,16 @@ export F_ENCRYPT_RM=false             # Override --keep/--rm when set to "true",
 
 ## Installation
 
+### From PyPi
+
+While the `virtualenv` and `source` commands are optional, `f-encrypt` does require Python3.
+
+```bash
+virtualenv --python=python3 env/
+source env/bin/activate
+pip install f-encrypt
+```
+
 ### From source
 
 ```bash
