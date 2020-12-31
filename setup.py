@@ -6,6 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="f-encrypt",
     version="1.01",
+    python_requires='>3.6',
     license='',
     include_package_data=True,
     packages=["fencrypt"],
