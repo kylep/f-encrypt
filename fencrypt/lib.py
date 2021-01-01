@@ -93,6 +93,6 @@ def get_output(path, output):
 def delete_file(path, keep):
     """ Delete the file at the given path """
     config = get_config()
-    if not keep or condfig['RM'].lower() == "true":
+    if not keep or config['RM'].lower() == "true":
         echo(f"Deleting {path}", 2)
         os.remove(path)
