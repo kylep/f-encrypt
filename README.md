@@ -38,8 +38,8 @@ The following environment variables are supported to further configure the tool.
 The shown values are their defaults.
 
 ```bash
-export F_ENCRYPT_KEY=example          # Set the encryption key so --key is not needed
-export F_ENCRYPT_SILENT=true          # Enable Silent mode - do not confirm or print anything
+export F_ENCRYPT_KEY=                 # Set the encryption key so --key is not needed
+export F_ENCRYPT_SILENT=false         # Enable Silent mode - do not confirm or print anything
 export F_ENCRYPT_VERBOSITY=1          # Set the level of verbosity for output text (1 to 5)
 export F_ENCRYPT_OUTPUT_SUFFIX=".ct"  # When -o is not used, output to <path><suffix>
 export F_ENCRYPT_RM=false             # Override --keep/--rm when set to "true", to rm source file
